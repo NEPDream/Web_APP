@@ -1,0 +1,87 @@
+<p><code style="color: black;">Manage >> Teams</code></p>
+<label (click)="open(content)" style="cursor: copy; ">
+    <i class="fa fa-plus-circle" aria-hidden="true"> Add a team</i>
+</label>
+<br/>
+<div class="form-group form-inline">
+    Filter: <input class="ml-2" type="text" [(ngModel)]="filterText" />
+</div>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">team</th>
+    <th scope="col">Company</th>
+    <th scope="col">Comment</th>
+    <th scope="col">number employee(s)</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let team of list_team | listfilter:filterName:filterText index as i">
+    <th scope="row">{{ i + 1 }}</th>
+    <td>
+      <i class="fa fa-building-o" aria-hidden="true" class="mr-2" style="width: 20px"></i>
+      <ngb-highlight [result]="team.name" [term]="filterText"></ngb-highlight>
+    </td>
+      <td><ngb-highlight [result]="team.company.name" [term]="filterText"></ngb-highlight></td>
+      <td><ngb-highlight [result]="team.comment" [term]="filterText"></ngb-highlight></td>
+      <td><ngb-highlight [result]="team.nbr_employee | number" [term]="filterText"></ngb-highlight></td>
+    <td>
+        <i (mousedown)="open_edit_team(content, team)" class="fa fa-pencil" aria-hidden="true" style="cursor:pointer"></i>
+        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        <i (mousedown)="open_delete_team(content, team)" class="fa fa-trash-o" aria-hidden="true" style="cursor:pointer"></i>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="show_create">Create New Team</h6>
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="!show_create" >Update Team</h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" id="IssueboxClose">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newTeamForm" (ngSubmit)="onSubmitTeam(modal)">
+        <div class="form-group">
+
+            <label for="name">Team Name</label>
+            <div class="input-group">
+                <input id="name" formControlName="name"  class="form-control" [ngClass]="{'is-invalid': submitted && i.name.errors}" placeholder="team name" type="text">
+                <div *ngIf="submitted && i.name.errors" class="invalid-feedback">
+                    <div *ngIf="i.name.errors.required">Issue name is required</div>
+                </div>
+            </div> 
+      
+            <label *ngIf="show_create" for="company" >Select Company</label>
+            <div *ngIf="show_create" class="input-group">
+                <select id="company" formControlName="company" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.company.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of list_companies" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+                </select>
+                <div *ngIf="submitted && i.comment.errors" class="invalid-feedback">
+                    <div *ngIf="i.company.errors.required">Company is required</div>
+                </div>
+            </div>
+
+            <label for="comment">Comment</label>
+            <div class="input-group">
+                <textarea id="comment" formControlName="comment"  class="form-control" [ngClass]="{'is-invalid': submitted && i.comment.errors}" placeholder="comment..."></textarea>
+                <div *ngIf="submitted && i.comment.errors" class="invalid-feedback">
+                    <div *ngIf="i.comment.errors.required">Issue name is required</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+                <button *ngIf="show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">Create New</button>
+                <button *ngIf="!show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">save</button>
+            </div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    </form>
+    </div>
+</ng-template>

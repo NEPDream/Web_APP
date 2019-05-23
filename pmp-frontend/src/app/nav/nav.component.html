@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" *ngIf="_authService.isAuthenticated">
+  <a class="navbar-brand" href="#" routerLinkActive="active">Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/issues" routerLinkActive="active">Issues</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/sprints" routerLinkActive="active">Tasks</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" routerLinkActive="active">Manage</a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="/pmp-frontedn/company" routerLinkActive="active">Companies</a>
+            <a class="dropdown-item" href="/pmp-frontedn/team" routerLinkActive="active">Teams</a>
+            <a class="dropdown-item" href="/pmp-frontedn/project" routerLinkActive="active">Projects</a>
+            <a class="dropdown-item" href="/pmp-frontedn/employee" routerLinkActive="active">Employees</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/pmp-frontedn/role" routerLinkActive="active">Roles Management</a>
+        </div>
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+        <a title="Messages" class="nav-link" routerLink="/stats" routerLinkActive="active" ><i class="fa fa-bar-chart" aria-hidden="true"> Stats</i></a>
+      <a title="Messages" class="nav-link" routerLink="/messages" routerLinkActive="active" ><i class="fa fa-envelope" aria-hidden="true"> Chat</i></a>
+      <a class="nav-link" href="account" routerLinkActive="active"><i class="fa fa-user-o" aria-hidden="true"> My Account</i></a>
+      <a title="Logout" class="nav-link" style="cursor:pointer" *ngIf="_authService.isAuthenticated" (click)="_authService.logoutUser()"><i class="fa fa-power-off" aria-hidden="true"> Logout</i></a> 
+      <a title="Login" class="nav-link" routerLink="/login" *ngIf="!_authService.isAuthenticated" routerLinkActive="inactive"><i class="fa fa-sign-in" aria-hidden="true">Login</i></a>
+    </ul>
+  </div>
+</nav>    

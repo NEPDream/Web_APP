@@ -1,0 +1,417 @@
+
+<div class="row vdivide" style="margin-top:5px">
+  <div class="col-sm-2">
+    <div>
+      <h6>Input Queue</h6>
+      <hr width="100%" style="margin:0;">
+    </div>
+  </div>
+  <div class="col-sm-2" >
+      <h6>Requirements Gathering</h6>
+      <hr width="100%" style="margin:0;">
+  </div>
+  <div class="col-sm-2" >
+      <div >
+          <h6>Work In Progress</h6>
+          <hr width="100%" style="margin:0;">
+      </div>
+   </div>
+  <div class="col-sm-2" >
+      <div >
+          <h6> Quality Assurance </h6>
+          <hr width="100%" style="margin:0;">
+      </div>
+  </div>
+  <div class="col-sm-2" >
+      <div >
+          <h6> User Acceptance</h6>
+          <hr width="100%" style="margin:0;">
+      </div>
+  </div>
+  <div class="col-sm-2" >
+      <div>
+          <h6>Done</h6>
+          <hr width="100%" style="margin:0;">
+      </div>
+  </div>
+</div>
+
+<div class="row vdivide" >
+        <div style="margin-left: 15px; margin-top: 5px; font-size: 12px;" >
+            <label (click)="open(content)" style="cursor: copy; ">
+                <i class="fa fa-plus-circle" aria-hidden="true"> Add an issue</i>
+            </label>
+
+            <label style="margin-left: 40px">
+                <input type="text" placeholder="user filter..." [(ngModel)]="user_filter" class="srch_bar"/>
+            </label>
+            
+            <label style="margin-left: 20px">
+                <input type="text" placeholder="project filter..." [(ngModel)]="project_filter" class="srch_bar"/>
+            </label>
+
+        </div>
+    <hr/>
+</div>
+<div class="row vdivide" >
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <!-- <h6>List</h6> -->
+            <cdk-drop
+            #inputqueueList
+            [data]="inputqueue"
+            [connectedTo]="[requirementsgatheringList, workinprogressList, qualityassuranceList, useracceptanceList, doneList]"
+            (dropped)="drop($event)"
+            class="example-list" id="Input Queue">
+                <div class="card" *ngFor="let item of inputqueue | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag>
+                        <div class="card-header" style="height:40px; font-size: 12px; font-weight: bold;">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <td style="font-size: 0.9em;" >{{item.project.name}}</td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); open_edit_issue(content, item)" style="cursor: pointer; "><i class="fa fa-pencil fa-lg" aria-hidden="true" ></i></td>
+                                        <td align="right"><i class="fa fa-ban" aria-hidden="true"></i></td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); showIssueModalDelete(content_delete_issue, item)"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </div>
+    
+                            <div class="card-body">
+                                <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)" >
+                                <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                                </a>
+                                <i class="fa fa-user fa-xs" aria-hidden="true" style="float: left;">{{item.employee.name}}</i> 
+                                <i class="fa fa-caret-down fa-xs" aria-hidden="true" style="float: left;"></i>
+                                <i style="font-size: 12px; float: right;">{{item.priority}}</i>
+                                <br/>
+                                <i style="font-size: 12px; float: right;" [ngClass]="(item.remaining[0]!='-')?'due-date-green':'due-date-red'" > Due : {{item.remaining}}</i>
+                            </div>
+                </div>
+            </cdk-drop>
+        </div>
+    </div>
+
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <!-- <h6>List</h6> -->
+            <cdk-drop
+                #requirementsgatheringList
+                [data]="requirementsgathering"
+                [connectedTo]="[inputqueueList, workinprogressList, qualityassuranceList, useracceptanceList, doneList]"
+                (dropped)="drop($event)"
+                class="example-list" id="Requirements Gathering">
+                <div class="card" *ngFor="let item of requirementsgathering | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag>
+                        <div class="card-header" style="height:40px; font-size: 12px; font-weight: bold;">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="font-size: 0.9em;">{{item.project.name}}</td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); open_edit_issue(content, item)" style="cursor: pointer; "><i class="fa fa-pencil fa-lg" aria-hidden="true" ></i></td>
+                                        <td align="right"><i class="fa fa-ban" aria-hidden="true"></i></td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); showIssueModalDelete(content_delete_issue, item)"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </div>
+    
+                            <div class="card-body">
+                                <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)">
+                                <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                                </a>
+                                <i class="fa fa-user fa-xs" aria-hidden="true" style="float: left;">{{item.employee.name}}</i> 
+                                <i class="fa fa-caret-down fa-xs" aria-hidden="true" style="float: left;"></i>
+                                <i style="font-size: 12px; float: right;">{{item.priority}}</i>
+                                <br/>
+                                <i style="font-size: 12px; float: right;" [ngClass]="(item.remaining[0]!='-')?'due-date-green':'due-date-red'" > Due : {{item.remaining}}</i>
+                            </div>
+                </div>
+            </cdk-drop>
+        </div>
+    </div>
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <cdk-drop
+            #workinprogressList
+            [data]="workinprogress"
+            [connectedTo]="[inputqueueList, requirementsgatheringList, qualityassuranceList, useracceptanceList, doneList]"
+            (dropped)="drop($event)"
+            class="example-list" id="Work In Progress">
+                <div class="card" *ngFor="let item of workinprogress | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag>
+                        <div class="card-header bg-secondary" style="height:40px; font-size: 12px; font-weight: bold;">
+                            <table style="width:100%">
+                                <tr>
+                                    <td style="font-size: 0.9em;">{{item.project.name}}</td>
+                                    <td align="right" (mousedown)="$event.stopPropagation(); open_edit_issue(content, item)" style="cursor: pointer; "><i class="fa fa-pencil fa-lg" aria-hidden="true" ></i></td>
+                                    <td align="right"><i class="fa fa-ban" aria-hidden="true"></i></td>
+                                    <td align="right" (mousedown)="$event.stopPropagation(); showIssueModalDelete(content_delete_issue, item)"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="card-body">
+                            <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)">
+                            <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                            </a>
+                            <i class="fa fa-user fa-xs" aria-hidden="true" style="float: left;">{{item.employee.name}}</i> 
+                            <i class="fa fa-caret-down fa-xs" aria-hidden="true" style="float: left;"></i>
+                            <i style="font-size: 12px; float: right;">{{item.priority}}</i>
+                            <br/>
+                            <i style="font-size: 12px; float: right;" [ngClass]="(item.remaining[0]!='-')?'due-date-green':'due-date-red'" > Due : {{item.remaining}}</i>
+                        </div>
+                </div>
+            </cdk-drop>
+        </div>
+
+    </div>
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <cdk-drop
+            #qualityassuranceList
+            [data]="qualityassurance"
+            [connectedTo]="[inputqueueList, requirementsgatheringList, workinprogressList, useracceptanceList, doneList]"
+            (dropped)="drop($event)"
+            class="example-list" id="Quality Assurance">
+                <div class="card" *ngFor="let item of qualityassurance | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag>
+                        <div class="card-header bg-info" style="height:40px; font-size: 12px; font-weight: bold;">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="font-size: 0.9em;">{{item.project.name}}</td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); open_edit_issue(content, item)" style="cursor: pointer; "><i class="fa fa-pencil fa-lg" aria-hidden="true" ></i></td>
+                                        <td align="right"><i class="fa fa-ban" aria-hidden="true"></i></td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); showIssueModalDelete(content_delete_issue, item)"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </div>
+    
+                            <div class="card-body">
+                                <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)">
+                                <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                                </a>
+                                <i class="fa fa-user fa-xs" aria-hidden="true" style="float: left;">{{item.employee.name}}</i> 
+                                <i class="fa fa-caret-down fa-xs" aria-hidden="true" style="float: left;"></i>
+                                <i style="font-size: 12px; float: right;">{{item.priority}}</i>
+                                <br/>
+                                <i style="font-size: 12px; float: right;" [ngClass]="(item.remaining[0]!='-')?'due-date-green':'due-date-red'" > Due : {{item.remaining}}</i>
+                            </div>
+                </div>
+            </cdk-drop>
+        </div>
+    </div>
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <cdk-drop
+            #useracceptanceList
+            [data]="useracceptance"
+            [connectedTo]="[inputqueueList, requirementsgatheringList, workinprogressList, qualityassuranceList, doneList]"
+            (dropped)="drop($event)"
+            class="example-list" id="User Acceptance">
+                <div class="card" *ngFor="let item of useracceptance | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag>
+                        <div class="card-header bg-info" style="height:40px; font-size: 12px; font-weight: bold;">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="font-size: 0.9em;">{{item.project.name}}</td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); open_edit_issue(content, item)" style="cursor: pointer; "><i class="fa fa-pencil fa-lg" aria-hidden="true" ></i></td>
+                                        <td align="right"><i class="fa fa-ban" aria-hidden="true"></i></td>
+                                        <td align="right" (mousedown)="$event.stopPropagation(); showIssueModalDelete(content_delete_issue, item)"><i class="fa fa-trash-o" aria-hidden="true"></i></td>
+                                    </tr>
+                                </table>
+                            </div>
+    
+                            <div class="card-body">
+                                <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)">
+                                <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                                </a>
+                                <i class="fa fa-user fa-xs" aria-hidden="true" style="float: left;">{{item.employee.name}}</i> 
+                                <i class="fa fa-caret-down fa-xs" aria-hidden="true" style="float: left;"></i>
+                                <i style="font-size: 12px; float: right;">{{item.priority}}</i>
+                                <br/>
+                                <i style="font-size: 12px; float: right;" [ngClass]="(item.remaining[0]!='-')?'due-date-green':'due-date-red'" > Due : {{item.remaining}}</i>
+                            </div>
+                </div>
+            </cdk-drop>
+        </div>
+    </div>
+
+    <div class="col-sm-2" >
+        <div class="example-container">
+            <cdk-drop
+            #doneList
+            [data]="done"
+            [connectedTo]="[inputqueueList, requirementsgatheringList, workinprogressList, qualityassuranceList, useracceptanceList]"
+            (dropped)="drop($event)"
+            class="example-list" id="Done">
+                <div class="card" *ngFor="let item of done | issuePipe:user_filter:project_filter" id="{{item.id}}" cdkDrag style="padding: 0px ; max-height: 100px; border-left: solid 0.4em; border-left-color: green;">
+                        <div class="card-body">
+                            <a href="#" (mousedown)="$event.stopPropagation(); openIssueDetails(content_detail_issue, item)">
+                            <h6 class="card-title" style="font-size: 12px; font-weight: bold;">{{item.name}}</h6>
+                            </a>                            
+                        </div>
+                </div>
+            </cdk-drop>
+        </div>
+    </div>
+</div>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="show_create">Create New Issue</h6>
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="!show_create" >Update Issue</h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" id="IssueboxClose">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newIssueForm" (ngSubmit)="onSubmitIssue(modal)">
+        <div class="form-group">
+
+            <label for="issueName">Issue Name</label>
+            <div class="input-group">
+                <input id="issueName" formControlName="name"  class="form-control" [ngClass]="{'is-invalid': submitted && i.name.errors}" placeholder="issue name" type="text">
+                <div *ngIf="submitted && i.name.errors" class="invalid-feedback">
+                    <div *ngIf="i.name.errors.required">Issue name is required</div>
+                </div>
+            </div>
+
+            <label for="startDate">Start Date</label>
+            <div class="input-group">
+                <input id="startDate" formControlName="start_date" class="form-control" [ngClass]="{'is-invalid': submitted && i.start_date.errors}" placeholder="yyyy-mm-dd" name="dp_comp" ngbDatepicker #dp="ngbDatepicker" >                
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
+                </div>
+                <div *ngIf="submitted && i.start_date.errors" class="invalid-feedback">
+                    <div *ngIf="i.start_date.errors.required">start date is required</div>
+                </div>
+            </div>
+
+            <label for="dueDate">Due Date</label>
+            <div class="input-group">
+                <input id="dueDate" formControlName="due_date" class="form-control" [ngClass]="{'is-invalid': submitted && i.due_date.errors}" placeholder="yyyy-mm-dd" name="dp_dueDate" ngbDatepicker #dp_1="ngbDatepicker" >                
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="dp_1.toggle()" type="button"></button>
+                </div>
+                <div *ngIf="submitted && i.due_date.errors" class="invalid-feedback">
+                    <div *ngIf="i.due_date.errors.required">due date is required</div>
+                </div>
+            </div>
+
+            <label for="priority">Priority Level</label>
+            <div class="input-group">
+                <select id="priority" formControlName="priority" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.priority.errors}">
+                    <option selected value="">Choose...</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <div *ngIf="submitted && i.priority.errors" class="invalid-feedback">
+                    <div *ngIf="i.priority.errors.required">priority Level is required</div>
+                </div>
+            </div>
+
+            <label for="project">Select Project</label>
+            <div class="input-group">
+                <select id="project" formControlName="project_id" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.project_id.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of project_list" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+                </select>
+                <div *ngIf="submitted && i.project_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.project_id.errors.required">project is required</div>
+                </div>
+            </div>
+
+            <label for="user">Assign to user</label>
+            <div class="input-group">
+                <select id="user" formControlName="employee_id" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.employee_id.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of employee_list" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+                </select>
+                <div *ngIf="submitted && i.employee_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.employee_id.errors.required">employee is required</div>
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="!show_create">
+                <hr style="margin: 0px"/>
+                <label (click)="show_add_sprint()" style="cursor: pointer; font-size: 12px; ">
+                    <i class="fa fa-plus-circle" aria-hidden="true"> Add to a sprint</i>
+                </label>
+                <select id="sprint" formControlName="sprint_id" class="custom-select form-control" *ngIf="add_to_sprint" >
+                    <option value=''>Choose...</option>
+                    <option *ngFor="let item of sprint_list"  value='{ "id": {{item.id}}, "name": "{{item.name}}" }'
+                            id="{{item.id}}"                           
+                            >
+                            {{item.name}} | {{item.project.name}}
+                    </option>
+                </select>
+        </div>
+
+        </div>
+        <div class="form-group">
+                <button *ngIf="show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">Create New</button>
+                <button *ngIf="!show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">save</button>
+            </div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    </form>
+    </div>
+    <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+    </div> -->
+</ng-template>
+
+<ng-template #content_detail_issue let-modal_detail_issue>
+    <div class="modal-header">
+      <h4 class="modal-title">Logs On Issue</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal_detail_issue.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <b><p>{{detail_issue.name}}</p></b>
+
+      <div class="actionBox">
+        <ul class="commentList">
+            <li *ngFor="let item of detail_issue.tracking">
+                <div class="commenterImage">
+                  <img src="assets/default-user.png" alt="no img"/>
+                </div>
+                <div class="commentText">
+                    <p class="">{{item.comment}}</p> <span class="date sub-text">{{item.employee_name}} on {{item.date}}</span>
+
+                </div>
+            </li>
+        </ul>
+        <form class="form-inline" [formGroup]="commentForm" (ngSubmit)="onSubmitComment(modal_detail_issue)">
+            <div class="form-group">
+                <textarea formControlName="comment" class="form-control" placeholder="Your comments..." [ngClass]="{'is-invalid': submitted && c.comment.errors}">
+                </textarea>
+                <div *ngIf="submitted && c.comment.errors" class="invalid-feedback">
+                    <div *ngIf="c.comment.errors.required">comment is required with min lenght of 5</div>
+                </div>
+            </div>
+            <br/>
+            <div class="form-group">
+                <button class="btn btn-primary" class="btn btn-success" >Add</button>
+            </div>
+        </form>
+    </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal_detail_issue.close('Close click')">Close</button>
+    </div>
+  </ng-template>
+
+  <ng-template #content_delete_issue let-modal_delete_issue>
+    <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Issue deletion Confirmation</h4>
+    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal_delete_issue.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+    <p><strong>Are you sure you want to delete the issue:</strong></p>
+    <p>{{issue_to_delete.name}} <br/>
+    <span class="text-danger">This operation can not be undone.</span>
+    </p>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal_delete_issue.dismiss('cancel click')">Cancel</button>
+    <button type="button" ngbAutofocus class="btn btn-danger" (click)="deleteIssue(modal_delete_issue)">Ok</button>
+    </div>
+  </ng-template>

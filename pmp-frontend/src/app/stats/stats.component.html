@@ -1,0 +1,44 @@
+<br/>
+
+<div id="selector">
+  <table>
+    <tr>
+      <td><label >Select Project</label></td>
+      <td>
+          <select [(ngModel)]="selected_project" class="custom-select form-control" >
+              <option selected value="">Choose...</option>
+              <option *ngFor="let item of list_project" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+          </select>
+      </td>
+      <td>
+          <button (click)="displayStats()" class="btn btn-primary" class="btn btn-success float-right">view stats</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+<p>Repartition of Task for the project per sprint</p>
+<div id="container_sprint">
+</div>
+
+<strong>
+    <br/>
+    <hr/>
+    <br/>
+</strong>
+
+<p>Repartition of issues for the project</p>
+<div id="container_issue">
+</div>
+
+<!-- <strong>
+    <br/>
+    <hr/>
+    <br/>
+</strong> -->
+
+
+<!-- <div id="container_user">
+</div> -->

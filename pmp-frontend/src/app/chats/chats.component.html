@@ -1,0 +1,231 @@
+<div class="row vdivide" style="margin-top:5px">
+  <div class="col-sm-2">
+    <div>
+      <table width="100%">
+        <tr >
+          <td><h6>Chats Rooms</h6></td>
+          <td align="right" (mousedown)="open_modal(content_modal_new_gm)" style="cursor: pointer;"> 
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+          </td>
+        </tr>
+      </table>      
+      <hr width="100%" style="margin:0;">
+    </div>
+    <div style="margin-left: 5vh; height:200px; overflow: auto; border-bottom: 0.5px solid grey;">
+      <table>
+        <tr *ngFor="let item of list_messages | issuePipe:'GM'" >
+          <td (mousedown)="activateCharRoom(item.room_id, item.room_name, item.room_name)" style="cursor: pointer;" [class.selected_room]="room_display[item.room_id]"> 
+            <i class="fa fa-comments" aria-hidden="true" style="cursor: pointer;"> {{item.room_name}} </i> 
+          </td>
+          <td align="right" (mousedown)="open_modal_add_user(content_modal_new_user_to_gm, item.room_id, item.room_name);" style="cursor: pointer;"> 
+              <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+            </td>
+        </tr>
+      </table>   
+    </div>
+
+    <br/>
+
+     <div>
+        <table width="100%">
+            <tr >
+              <td><h6>Directs Messages</h6></td> 
+              <td align="right"> 
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </td>
+              <td align="right" (mousedown)="open_modal(content_modal_new_dm)" style="cursor: pointer; "> 
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+              </td>
+            </tr>
+          </table> 
+        <hr width="100%" style="margin:0;">
+      </div>
+      <div style="margin-left: 5vh; height:400px; overflow: auto;">
+          <table>
+            <tr *ngFor="let item of list_messages | issuePipe:'DM'" style="cursor:pointer;">
+              <td [class.selected_room]="room_display[item.room_id]"> 
+                <em *ngFor="let user of item.room_users">
+                  <i class="fa fa-commenting" aria-hidden="true" style="cursor:pointer;" *ngIf="user.employee_id != current_emp_id" (mousedown)="activateCharRoom(item.room_id, user.employee_name, item.room_name)">                     
+                      <label style="padding-left: 5px; cursor:pointer;"> {{user.employee_name}}</label> 
+                  </i> 
+              </em>
+              </td>
+            </tr>
+          </table>   
+        </div>
+
+  </div>
+
+  <div class="col-sm-8">
+      <h6>Messaging  >>> {{current_room_name}}</h6>
+      <hr width="100%" style="margin:0;">
+      <div class="mesgs" *ngFor="let room of list_messages" [style.display]="room_display[room.room_id] ? 'block' : 'none'">
+          <div class="msg_history" >
+            <!-- <div>
+              {{room.room_name}}
+            </div> -->
+            <div *ngFor="let msg of room.room_messages">
+
+              <div *ngIf="msg.employee_id==current_emp_id" id="{{msg.id}}">
+                 <div class="outgoing_msg">
+                    <div class="sent_msg">
+                      <p *ngIf="msg.type == 'text'"> {{msg.value}}</p>
+                      <img *ngIf="msg.type == 'img'" src="{{msg.value}}"/>
+                      <span class="time_date">You    |    {{msg.date | amCalendar}}</span> 
+                    </div>
+                  </div>
+              </div>
+
+              <div *ngIf="msg.employee_id!=current_emp_id" id="{{msg.id}}">
+                  <div class="incoming_msg">
+                    <div class="incoming_msg_img"> <i class="fa fa-user" aria-hidden="true"></i> </div>
+                    <div class="received_msg">
+                      <div class="received_withd_msg">
+                        <p *ngIf="msg.type == 'text'">{{msg.value}}</p>
+                        <img *ngIf="msg.type == 'img'" src="{{msg.value}}"/>
+                        <span class="time_date">{{msg.employee_name}}    |    {{msg.date | amCalendar}}</span></div>
+                    </div>
+                  </div>
+              </div>
+
+            </div>
+
+            <div id="room_{{room.room_id}}">&nbsp;</div>
+          </div>
+        <br/>
+        <div class="type_msg">
+          <div class="input_msg_write">
+            <!-- <input type="text" class="write_msg" placeholder="Type a message" /> -->
+            <textarea class="write_msg" [(ngModel)]="text_message" placeholder="Type a chat message" (keypress)="keyPress($event, room.room_id, room.room_name)" style="width: 100%; padding-right: 10px;"></textarea>
+            <button class="emoji_btn" type="button">
+              <i
+                (click)="toggled = !toggled"
+                [(emojiPickerIf)]="toggled"
+                [emojiPickerDirection]="'bottom' || 'top' || 'left' || 'right'"
+                (emojiPickerSelect)="handleSelection($event)">😄</i>
+            </button>
+            <button class="msg_send_btn" type="button" (mousedown)="send_new_message(room.room_id, room.room_name)"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+          </div>
+        </div>
+      </div>
+
+  </div>
+
+  <div class="col-sm-2">
+    users
+    <hr width="100%" style="margin:0;">
+    <div *ngFor="let room of list_messages" [style.display]="room_display[room.room_id] ? 'block' : 'none'" style="height: 40%; overflow: auto;">
+      <br/>
+      <p style="margin-bottom: 0px;" *ngFor="let user of room.room_users">
+        <i class="fa fa-at" aria-hidden="true" >{{user.employee_name}} </i>
+      </p>
+    </div>
+    <hr/>
+    <div>
+        <fieldset>
+            <legend style="color:blue; font-size: 0.5rem">Draw your emoji</legend>
+            <canvas #canvas id="canvas" width="210%" height="200%" style="border: 1px solid black;" >
+          </canvas>
+
+            <table>
+              <tr>
+                <td>Color</td>
+                <td><div style="width:10px;height:10px;background:green;" id="green" (click)="color('green')"></div></td>
+                <td><div style="width:10px;height:10px;background:blue;" id="blue" (click)="color('blue')"></div></td>
+                <td><div style="width:10px;height:10px;background:red;" id="red" (click)="color('red')"></div></td>
+                <td><div style="width:10px;height:10px;background:yellow;" id="yellow" (click)="color('yellow')"></div></td>
+                <td><div style="width:10px;height:10px;background:orange;" id="orange" (click)="color('orange')"></div></td>
+                <td><div style="width:10px;height:10px;background:black;" id="black" (click)="color('black')"></div></td>
+              </tr>              
+            </table>
+            <table>
+                <tr>
+                  <td>Eraser</td>
+                  <td><div style="width:15px;height:15px;background:white;border:2px solid;" id="white" (click)="color('white')"></div></td>
+                  <td><input type="button" value="clear" id="clr" size="23" (click)="erase()"></td>
+                  <td>
+                      <input type="button" value="send" id="btn" size="30" (click)="sendPictureMsg();" >
+                  </td>
+                </tr>
+            </table>
+            <!-- <table>
+              <tr>
+                <td>
+                    <input type="button" value="save" id="btn" size="30" (click)="save()" >
+                </td>
+              </tr>
+            </table> -->
+
+            <img id="canvasimg"  style="display:none;">
+            
+        </fieldset>
+    </div>
+    
+  </div>
+
+</div>
+
+
+<ng-template #content_modal_new_dm let-modal_new_dm>
+    <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">New Chat</h4>
+    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal_new_dm.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <label for="user">Start New Conversation With : </label>
+        <div class="input-group">
+            <select id="user" class="custom-select form-control" [(ngModel)]='new_dm_user_select'>
+                <option selected value="">Choose...</option>
+                <option *ngFor="let item of employee_list" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal_new_dm.dismiss('cancel click')">Cancel</button>
+    <button type="button" ngbAutofocus class="btn btn-success" (click)="start_new_dm(modal_new_dm)">Ok</button>
+    </div>
+  </ng-template>
+
+<ng-template #content_modal_new_user_to_gm let-modal_new_usr_gm>
+    <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Add user to a room</h4>
+    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal_new_usr_gm.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <label for="user">Select user to add to the room {{selected_group.name}} : </label>
+        <div class="input-group">
+            <select id="user" class="custom-select form-control" [(ngModel)]='new_gm_user_select'>
+                <option selected value="">Choose...</option>
+                <option *ngFor="let item of employee_list" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal_new_usr_gm.dismiss('cancel click')">Cancel</button>
+    <button type="button" ngbAutofocus class="btn btn-success" (click)="add_user_to_gm(modal_new_usr_gm)">Add</button>
+    </div>
+  </ng-template> 
+
+
+  <ng-template #content_modal_new_gm let-modal_new_gm>
+      <div class="modal-header">
+      <h4 class="modal-title" id="modal-title">New chat room</h4>
+      <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal_new_gm.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+      <div class="modal-body">
+          <label for="user">Name of the Room</label>
+          <div class="input-group">              
+                  <input id="room_name"  [(ngModel)]='new_gm_name' class="form-control"  placeholder="room name" type="text">
+          </div>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal_new_gm.dismiss('cancel click')">Cancel</button>
+      <button type="button" ngbAutofocus class="btn btn-success" (click)="start_new_gm(modal_new_gm)">Ok</button>
+      </div>
+    </ng-template>

@@ -1,0 +1,72 @@
+<p><code style="color: black;">Manage >> Companies</code></p>
+<label (click)="open(content)" style="cursor: copy; ">
+    <i class="fa fa-plus-circle" aria-hidden="true"> Add a company</i>
+</label>
+<br/>
+<div class="form-group form-inline">
+    Filter: <input class="ml-2" type="text" [(ngModel)]="filterText" />
+</div>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">company</th>
+    <th scope="col">Comment</th>
+    <th scope="col">number employee(s)</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let company of list_companies | listfilter:filterName:filterText index as i">
+    <th scope="row">{{ i + 1 }}</th>
+    <td>
+      <i class="fa fa-building-o" aria-hidden="true" class="mr-2" style="width: 20px"></i>
+      <ngb-highlight [result]="company.name" [term]="filterText"></ngb-highlight>
+    </td>
+    <td><ngb-highlight [result]="company.comment" [term]="filterText"></ngb-highlight></td>
+    <td><ngb-highlight [result]="company.nbr_employee | number" [term]="filterText"></ngb-highlight></td>
+    <td>
+        <i (mousedown)="open_edit_company(content, company)" class="fa fa-pencil" aria-hidden="true" style="cursor:pointer"></i>
+        &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        <i (mousedown)="open_delete_issue(content, company)" class="fa fa-trash-o" aria-hidden="true" style="cursor:pointer"></i>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="show_create">Create New Company</h6>
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="!show_create" >Update Company</h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" id="IssueboxClose">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newCompanyForm" (ngSubmit)="onSubmitCompany(modal)">
+        <div class="form-group">
+            <label for="name">Company Name</label>
+            <div class="input-group">
+                <input id="name" formControlName="name"  class="form-control" [ngClass]="{'is-invalid': submitted && c.name.errors}" placeholder="company name" type="text">
+                <div *ngIf="submitted && c.name.errors" class="invalid-feedback">
+                    <div *ngIf="c.name.errors.required">Company name is required</div>
+                </div>
+            </div>
+            <label for="comment">Comment</label>
+            <div class="input-group">
+                <textarea id="comment" formControlName="comment" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && c.comment.errors}">                    
+                </textarea>
+                <div *ngIf="submitted && c.comment.errors" class="invalid-feedback">
+                    <div *ngIf="c.comment.errors.required">Comment is required</div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button *ngIf="show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">Create New</button>
+            <button *ngIf="!show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">Save</button>
+        </div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    </form>
+    </div>
+</ng-template>

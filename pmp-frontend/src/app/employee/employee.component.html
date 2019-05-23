@@ -1,0 +1,175 @@
+<p><code style="color: black;">Manage >> Employee</code></p>
+<label (click)="open(content)" style="cursor: copy; ">
+    <i class="fa fa-plus-circle" aria-hidden="true"> Add an employee</i>
+</label>
+<br/>
+<div class="form-group form-inline">
+    Filter: <input class="ml-2" type="text" [(ngModel)]="filterText" />
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">name</th>
+      <th scope="col">badge</th>
+      <th scope="col">Company</th>
+      <th scope="col">Team</th>
+      <th scope="col">Role</th>
+      <th scope="col">Profile</th>
+      <th scope="col">start date</th>
+      <th scope="col">full time</th>
+      <th scope="col">active?</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let item of list_employee | listfilter:filterName:filterText index as i">
+      <th scope="row">{{ i + 1 }}</th>
+        <td>
+          <i class="fa fa-building-o" aria-hidden="true" class="mr-2" style="width: 20px"></i>
+          <ngb-highlight [result]="item.name" [term]="filterText"></ngb-highlight>
+        </td>
+        <td><ngb-highlight [result]="item.badge" [term]="filterText"></ngb-highlight></td>
+        <td><ngb-highlight [result]="item.company_name" [term]="filterText"></ngb-highlight></td>
+        <td><ngb-highlight [result]="item.team_name" [term]="filterText"></ngb-highlight></td>
+        <td><ngb-highlight [result]="item.role" [term]="filterText"></ngb-highlight></td>
+        <td><ngb-highlight [result]="item.profile" [term]="filterText"></ngb-highlight></td>
+        <td>{{item.start_date | amCalendar}}</td>
+        <td><ngb-highlight [result]="item.is_full_time" [term]="filterText"></ngb-highlight></td>
+        <td><ngb-highlight [result]="item.active" [term]="filterText"></ngb-highlight></td>
+      <td>
+          <i (mousedown)="open_edit_employee(content, item)" class="fa fa-pencil" aria-hidden="true" style="cursor:pointer"></i>
+          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+          <i (mousedown)="open_delete_employee(content, item)" class="fa fa-trash-o" aria-hidden="true" style="cursor:pointer"></i>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+
+  <ng-template #content let-modal>
+    <div class="modal-header">
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="show_create">Create New Employee</h6>
+        <h6 class="modal-title" id="modal-basic-title" *ngIf="!show_create" >Update Employee</h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" id="IssueboxClose">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="newEmployeeForm" (ngSubmit)="onSubmitEmployee(modal)">
+        <div class="form-group">
+
+            <label *ngIf="!show_create" for="name">Employee Name</label>
+            <div *ngIf="!show_create" class="input-group">
+                <input id="name" readonly="readonly" formControlName="name"  class="form-control" [ngClass]="{'is-invalid': submitted && i.name.errors}" type="text">
+            </div>
+
+            <label *ngIf="show_create" for="user">Select the user</label>
+            <div *ngIf="show_create" class="input-group">
+                <select id="user_id" formControlName="user_id" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.user_id.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of list_unemployed" id="{{item.id}}" value={{item.id}}>{{item.name}} | ({{item.profile}})</option>
+                </select>
+                <div *ngIf="submitted && i.user_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.user_id.errors.required">user is required</div>
+                </div>
+            </div>
+
+            <label for="role_id">Assign a role</label>
+            <div class="input-group">
+                <select id="role_id" formControlName="role_id" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.role_id.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of list_roles" id="{{item.id}}" value={{item.id}}>{{item.name}}</option>
+                </select>
+                <div *ngIf="submitted && i.role_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.role_id.errors.required">role is required</div>
+                </div>
+            </div>
+
+            <label for="badge">badge</label>
+            <div class="input-group">
+                <input id="badge" formControlName="badge" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.badge.errors}" type="text"/>
+                    <div *ngIf="submitted && i.badge.errors" class="invalid-feedback">
+                    <div *ngIf="i.badge.errors.required">badge is required</div>
+                </div>
+            </div>
+
+            <label for="start_date">Start Date</label>
+            <div class="input-group">
+                <input id="start_date" formControlName="start_date" class="form-control" [ngClass]="{'is-invalid': submitted && i.start_date.errors}" placeholder="yyyy-mm-dd" name="dp_comp" ngbDatepicker #dp="ngbDatepicker" >                
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
+                </div>
+                <div *ngIf="submitted && i.start_date.errors" class="invalid-feedback">
+                    <div *ngIf="i.start_date.errors.required">start date is required</div>
+                </div>
+            </div>
+
+            <label for="due_date">End Date</label>
+            <div class="input-group">
+                <input id="due_date" formControlName="due_date" class="form-control" [ngClass]="{'is-invalid': submitted && i.due_date.errors}" placeholder="yyyy-mm-dd" name="dp_dueDate" ngbDatepicker #dp_1="ngbDatepicker" >                
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="dp_1.toggle()" type="button"></button>
+                </div>
+                <div *ngIf="submitted && i.due_date.errors" class="invalid-feedback">
+                    <div *ngIf="i.due_date.errors.required">due date is required</div>
+                </div>
+            </div>              
+            
+            <label *ngIf="show_create" for="company_id">Select Company</label>
+            <div *ngIf="show_create" class="input-group">
+                <select (change)="onCompanyChange()" id="company_id" formControlName="company_id" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.company_id.errors}">
+                    <option selected value="">Choose...</option>
+                    <option *ngFor="let item of list_companies" id="{{item.id}}" value='{ "id": {{item.id}}, "name": "{{item.name}}" }'>{{item.name}}</option>
+                </select>
+                <div *ngIf="submitted && i.company_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.company_id.errors.required">Company is required</div>
+                </div>
+            </div>
+
+            <label *ngIf="show_create" for="user">Select Teams</label>
+            <div *ngIf="show_create" class="input-group">
+                <ng-multiselect-dropdown
+                  [placeholder]="'Select teams'"
+                  [data]="list_team_filter"
+                  formControlName="team_id"
+                  [settings]="dropdownSettings" style="width: 100%;">
+                </ng-multiselect-dropdown>
+                <div *ngIf="submitted && i.team_id.errors" class="invalid-feedback">
+                    <div *ngIf="i.team_id.errors.required">Team is required</div>
+                </div>
+            </div>
+
+            <label for="priority">Full Time ?</label>
+            <div class="input-group">
+                <select id="is_full_time" formControlName="is_full_time" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.is_full_time.errors}">
+                    <option selected value="">Choose...</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <div *ngIf="submitted && i.is_full_time.errors" class="invalid-feedback">
+                    <div *ngIf="i.is_full_time.errors.required">is_full_time is required</div>
+                </div>
+            </div>
+
+            <label *ngIf="!show_create" for="active">Active ?</label>
+            <div  *ngIf="!show_create" class="input-group">
+                <select id="active" formControlName="active" class="custom-select form-control" [ngClass]="{'is-invalid': submitted && i.active.errors}">
+                    <option selected value="">Choose...</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <div *ngIf="submitted && i.active.errors" class="invalid-feedback">
+                    <div *ngIf="i.active.errors.required">is_full_time is required</div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="form-group">
+                <button *ngIf="show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">Create New</button>
+                <button *ngIf="!show_create" [disabled]="loading" class="btn btn-primary" class="btn btn-success float-right">save</button>
+            </div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    </form>
+    </div>
+</ng-template>
